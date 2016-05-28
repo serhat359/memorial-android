@@ -75,28 +75,12 @@ public class MainActivity extends FragmentActivity implements Debugable{
 		System.setProperty("awt.useSystemAAFontSettings", "on");
 		System.setProperty("swing.aatext", "true");
 
-		/*
-		// question panel
-		qtext = new MyTextField("");
-		qtext.setFont(new Font("MS Mincho", Font.PLAIN, 64));
-		q.add(qtext, BorderLayout.CENTER);
-		
-		atext = new MyTextField("");
-		atext.setFont(new Font("MS PMincho", Font.PLAIN, 36));
-		a.add(atext, BorderLayout.CENTER);
-		
-		// grade panel
-		buttons = new MyButton[] { new MyButton("Very Rarely", 10), new MyButton("Rarely", 3),
-				new MyButton("Often", 1), new MyButton("Very Often", 0) };
-		for(int i = 0; i < buttons.length; i++)
-			grade.add(buttons[i]);*/
-
 		show = (Button)findViewById(R.id.showAnswer);
 		atext = (TextView)findViewById(R.id.answerView);
 		qtext = (TextView)findViewById(R.id.questionView);
 
 		qtext.setTypeface(Typeface.createFromAsset(getResources().getAssets(), "MSMINCHO.TTF"));
-		
+
 		buttons = new Button[] { (Button)findViewById(R.id.veryRarely),
 				(Button)findViewById(R.id.rarely), (Button)findViewById(R.id.often),
 				(Button)findViewById(R.id.veryOften), };

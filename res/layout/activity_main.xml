@@ -14,4 +14,72 @@
         android:layout_height="wrap_content"
         android:text="@string/debug" />
 
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/veryRarely"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/veryRarely" />
+
+            <Button
+                android:id="@+id/rarely"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/rarely" />
+
+            <Button
+                android:id="@+id/often"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/often" />
+
+            <Button
+                android:id="@+id/veryOften"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/veryOften" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/questionView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/debug"
+        android:layout_centerHorizontal="true"
+        android:text="Large Text"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <TextView
+        android:id="@+id/answerView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/questionView"
+        android:layout_below="@+id/questionView"
+        android:layout_marginTop="23dp"
+        android:text="Large Text"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <Button
+        android:id="@+id/showAnswer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/linearLayout1"
+        android:layout_centerHorizontal="true"
+        android:text="@string/showAnswer" />
+
 </RelativeLayout>

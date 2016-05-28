@@ -22,12 +22,14 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
+        android:gravity="center_vertical|fill_vertical|center_horizontal|fill_horizontal|center"
         android:orientation="vertical" >
 
         <TextView
             android:id="@+id/questionView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:text="Q"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textSize="36sp"
@@ -39,6 +41,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="23dp"
             android:layout_weight="0.33"
+            android:gravity="center"
             android:text="A"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 

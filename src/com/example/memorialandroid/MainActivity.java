@@ -24,8 +24,6 @@ public class MainActivity extends FragmentActivity implements Debugable{
 
 	// TODO font düzeltmesi yap, stil olsun MS Mincho gibi
 
-	// TODO yazýlarý ortala
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);

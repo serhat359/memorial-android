@@ -35,6 +35,7 @@ public class MainActivity extends FragmentActivity implements Debugable{
 
 		// Set Debug
 		debugView = (TextView)findViewById(R.id.debug);
+		debugView.setText("");
 
 		//////////////////////////////////////////// Code Start
 
@@ -176,8 +177,8 @@ public class MainActivity extends FragmentActivity implements Debugable{
 		start();
 	}
 	
+	@SuppressWarnings("unused")
 	private static void debug(String message){
-		debugView.setText("");
 		//debugView.setText(debugView.getText().toString() + '\n' + message);
 	}
 

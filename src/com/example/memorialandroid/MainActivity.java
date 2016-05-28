@@ -20,8 +20,14 @@ public class MainActivity extends FragmentActivity implements Debugable{
 	static Button show;
 	static TextView qtext;
 	static TextView atext;
-	static ValButton[] buttons;
+	static Button[] buttons;
 
+	// TODO font düzeltmesi yap, stil olsun MS Mincho gibi
+	
+	// TODO yazýlarý ortala
+	
+	// TODO portrait mod deðiþmesini engelle
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -32,20 +38,11 @@ public class MainActivity extends FragmentActivity implements Debugable{
 
 		//////////////////////////////////////////// Code Start
 
-		debug("Program started");
+		debug("Activity created");
 
 		createDatabase();
-
-		debug("Created database");
-
 		prepareGUI();
-
-		debug("prepared the GUI");
-
 		countRows();
-
-		debug("Counted the rows");
-
 		start();
 
 		debug("Started the program");
@@ -100,10 +97,10 @@ public class MainActivity extends FragmentActivity implements Debugable{
 		atext = (TextView)findViewById(R.id.answerView);
 		qtext = (TextView)findViewById(R.id.questionView);
 
-		buttons = new ValButton[] { new ValButton((Button)findViewById(R.id.veryRarely), 10),
-				new ValButton((Button)findViewById(R.id.rarely), 3),
-				new ValButton((Button)findViewById(R.id.often), 1),
-				new ValButton((Button)findViewById(R.id.veryOften), 0) };
+		buttons = new Button[] { (Button)findViewById(R.id.veryRarely),
+				(Button)findViewById(R.id.rarely),
+				(Button)findViewById(R.id.often),
+				(Button)findViewById(R.id.veryOften), };
 	}
 
 	public void countRows(){
@@ -143,7 +140,7 @@ public class MainActivity extends FragmentActivity implements Debugable{
 		}
 	}
 
-	private static String getStackTrace(Exception e){
+	public static String getStackTrace(Exception e){
 		StringBuilder sb = new StringBuilder();
 		
 		for(StackTraceElement i: e.getStackTrace()){
@@ -153,19 +150,35 @@ public class MainActivity extends FragmentActivity implements Debugable{
 		return sb.toString();
 	}
 	
-	public static void buttonsEnabled(boolean b){
+	public void buttonsEnabled(boolean b){
 		for(int i = buttons.length - 1; i >= 0; i--)
-			buttons[i].button.setEnabled(b);
+			buttons[i].setEnabled(b);
 	}
 
-	public static void showAnswer_click(View v){
+	@SuppressWarnings("unused")
+	public void showAnswer_click(View v){
 		show.setEnabled(false);
 		buttonsEnabled(true);
 		atext.setText(db.getAnswer());
 	}
 	
+	public void rateClicked(View v){
+		Button button = (Button)v;
+		
+		int degree = Integer.parseInt((String)button.getTag());
+		
+		buttonsEnabled(false);
+		
+		db.setDegree(degree, this);
+		
+		debug("you selected "+degree);
+		
+		start();
+	}
+	
 	private static void debug(String message){
-		// debugView.setText(debugView.getText().toString() + '\n' + message);
+		debugView.setText("");
+		//debugView.setText(debugView.getText().toString() + '\n' + message);
 	}
 
 	private String getAssetContent(String fileName){
@@ -177,7 +190,6 @@ public class MainActivity extends FragmentActivity implements Debugable{
 			return text;
 		}
 		catch(IOException e){
-			// TODO Auto-generated catch block
 			return e.getMessage();
 		}
 	}

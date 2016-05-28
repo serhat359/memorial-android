@@ -10,6 +10,9 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 	private static final int DATABASE_VERSION = 1;
 	private static final String DATABASE_NAME = "cardsManager";
 	private static final String TABLE_CARDS = "CARDS";
+	private static final String COL_REMAINING = "REMAINING";
+	private static final String COL_FRONT = "FRONT";
+	private static final String COL_BACK = "BACK";
 
 	private Cursor cursor;
 
@@ -52,19 +55,19 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 
 		while(true){
 			int n = (int)(Math.random() * numrows);
-			
+
 			cursor = db.rawQuery("select * from cards limit " + n + ",1", null);
-			
+
 			cursor.moveToFirst();
-			
-			int rem = cursor.getInt(2);
+
+			int rem = cursor.getInt(cursor.getColumnIndex(COL_REMAINING));
 			if(rem == 0)
 				break;
 			db.execSQL("update cards set remaining='" + (rem - 1) + "' where front='"
-					+ cursor.getString(0) + "'");
+					+ cursor.getString(cursor.getColumnIndex(COL_FRONT)) + "'");
 		}
 
-		return cursor.getString(0);
+		return cursor.getString(cursor.getColumnIndex(COL_FRONT));
 	}
 
 	public void importRecords(String sql, Debugable method){
@@ -72,12 +75,12 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 
 		try{
 			db.beginTransaction();
-			db.execSQL("delete from "+TABLE_CARDS);
-			
+			db.execSQL("delete from " + TABLE_CARDS);
+
 			for(String s: sql.split("\n")){
 				db.execSQL(s);
 			}
-			
+
 			db.setTransactionSuccessful();
 			db.endTransaction();
 		}
@@ -87,6 +90,18 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 	}
 
 	public String getAnswer(){
-		return cursor.getString(1);
+		return cursor.getString(cursor.getColumnIndex(COL_BACK));
+	}
+
+	public void setDegree(int degree, Debugable method){
+		SQLiteDatabase db = this.getWritableDatabase();
+
+		try{
+			db.execSQL("update cards set remaining='" + degree + "' where front='"
+					+ cursor.getString(cursor.getColumnIndex(COL_FRONT)) + "'");
+		}
+		catch(Exception e){
+			method.print(e.getMessage());
+		}
 	}
 }

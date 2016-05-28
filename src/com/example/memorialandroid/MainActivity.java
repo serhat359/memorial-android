@@ -7,6 +7,7 @@ import java.io.*;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -157,8 +158,14 @@ public class MainActivity extends FragmentActivity implements Debugable{
 			buttons[i].button.setEnabled(b);
 	}
 
+	public static void showAnswer_click(View v){
+		show.setEnabled(false);
+		buttonsEnabled(true);
+		atext.setText(db.getAnswer());
+	}
+	
 	private static void debug(String message){
-		debugView.setText(debugView.getText().toString() + '\n' + message);
+		// debugView.setText(debugView.getText().toString() + '\n' + message);
 	}
 
 	private String getAssetContent(String fileName){

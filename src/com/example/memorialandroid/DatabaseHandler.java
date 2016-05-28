@@ -11,6 +11,8 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 	private static final String DATABASE_NAME = "cardsManager";
 	private static final String TABLE_CARDS = "CARDS";
 
+	private Cursor cursor;
+
 	public DatabaseHandler(Context context){
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 	}
@@ -48,8 +50,6 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 	public String getQuestion(int numrows){
 		SQLiteDatabase db = this.getWritableDatabase();
 
-		Cursor cursor;
-
 		while(true){
 			int n = (int)(Math.random() * numrows);
 			
@@ -84,5 +84,9 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 		catch(Exception e){
 			method.print(e.getMessage());
 		}
+	}
+
+	public String getAnswer(){
+		return cursor.getString(1);
 	}
 }

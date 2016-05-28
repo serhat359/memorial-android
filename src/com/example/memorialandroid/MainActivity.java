@@ -4,6 +4,7 @@ import android.support.v4.app.FragmentActivity;
 
 import java.io.*;
 
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -94,6 +95,8 @@ public class MainActivity extends FragmentActivity implements Debugable{
 		atext = (TextView)findViewById(R.id.answerView);
 		qtext = (TextView)findViewById(R.id.questionView);
 
+		qtext.setTypeface(Typeface.createFromAsset(getResources().getAssets(), "MSMINCHO.TTF"));
+		
 		buttons = new Button[] { (Button)findViewById(R.id.veryRarely),
 				(Button)findViewById(R.id.rarely), (Button)findViewById(R.id.often),
 				(Button)findViewById(R.id.veryOften), };

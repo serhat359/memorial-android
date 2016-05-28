@@ -32,7 +32,7 @@
             android:gravity="center"
             android:text="Q"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textSize="36sp"
+            android:textSize="50sp"
             android:typeface="normal" />
 
         <TextView

@@ -23,11 +23,9 @@ public class MainActivity extends FragmentActivity implements Debugable{
 	static Button[] buttons;
 
 	// TODO font düzeltmesi yap, stil olsun MS Mincho gibi
-	
+
 	// TODO yazýlarý ortala
-	
-	// TODO portrait mod deðiþmesini engelle
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -99,8 +97,7 @@ public class MainActivity extends FragmentActivity implements Debugable{
 		qtext = (TextView)findViewById(R.id.questionView);
 
 		buttons = new Button[] { (Button)findViewById(R.id.veryRarely),
-				(Button)findViewById(R.id.rarely),
-				(Button)findViewById(R.id.often),
+				(Button)findViewById(R.id.rarely), (Button)findViewById(R.id.often),
 				(Button)findViewById(R.id.veryOften), };
 	}
 
@@ -143,14 +140,14 @@ public class MainActivity extends FragmentActivity implements Debugable{
 
 	public static String getStackTrace(Exception e){
 		StringBuilder sb = new StringBuilder();
-		
+
 		for(StackTraceElement i: e.getStackTrace()){
-			sb.append("Line "+i.getLineNumber() + " in " + i.getMethodName() + '\n');
+			sb.append("Line " + i.getLineNumber() + " in " + i.getMethodName() + '\n');
 		}
-		
+
 		return sb.toString();
 	}
-	
+
 	public void buttonsEnabled(boolean b){
 		for(int i = buttons.length - 1; i >= 0; i--)
 			buttons[i].setEnabled(b);
@@ -162,24 +159,24 @@ public class MainActivity extends FragmentActivity implements Debugable{
 		buttonsEnabled(true);
 		atext.setText(db.getAnswer());
 	}
-	
+
 	public void rateClicked(View v){
 		Button button = (Button)v;
-		
+
 		int degree = Integer.parseInt((String)button.getTag());
-		
+
 		buttonsEnabled(false);
-		
+
 		db.setDegree(degree, this);
-		
-		debug("you selected "+degree);
-		
+
+		debug("you selected " + degree);
+
 		start();
 	}
-	
+
 	@SuppressWarnings("unused")
 	private static void debug(String message){
-		//debugView.setText(debugView.getText().toString() + '\n' + message);
+		// debugView.setText(debugView.getText().toString() + '\n' + message);
 	}
 
 	private String getAssetContent(String fileName){

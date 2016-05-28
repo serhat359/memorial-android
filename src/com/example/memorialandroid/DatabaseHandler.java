@@ -32,34 +32,57 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_CARDS);
 		onCreate(db);
 	}
-	
+
 	public int getCount(){
 		SQLiteDatabase db = this.getWritableDatabase();
-		
-		Cursor cursor = db.rawQuery("select count(*) from cards", null); 
-		
+
+		Cursor cursor = db.rawQuery("select count(*) from cards", null);
+
 		cursor.moveToFirst();
-		
+
 		int count = cursor.getInt(0);
-		
+
 		return count;
 	}
 
 	public String getQuestion(int numrows){
 		SQLiteDatabase db = this.getWritableDatabase();
-		
+
 		Cursor cursor;
-		
+
 		while(true){
 			int n = (int)(Math.random() * numrows);
+			
 			cursor = db.rawQuery("select * from cards limit " + n + ",1", null);
-			int rem = Integer.parseInt(cursor.getString(3));
+			
+			cursor.moveToFirst();
+			
+			int rem = cursor.getInt(2);
 			if(rem == 0)
 				break;
-			db.execSQL("update cards set remaining='" + (rem - 1)
-					+ "' where front='" + cursor.getString(1) + "'");
+			db.execSQL("update cards set remaining='" + (rem - 1) + "' where front='"
+					+ cursor.getString(0) + "'");
 		}
-		
-		return cursor.getString(1);
+
+		return cursor.getString(0);
+	}
+
+	public void importRecords(String sql, Debugable method){
+		SQLiteDatabase db = this.getWritableDatabase();
+
+		try{
+			db.beginTransaction();
+			db.execSQL("delete from "+TABLE_CARDS);
+			
+			for(String s: sql.split("\n")){
+				db.execSQL(s);
+			}
+			
+			db.setTransactionSuccessful();
+			db.endTransaction();
+		}
+		catch(Exception e){
+			method.print(e.getMessage());
+		}
 	}
 }

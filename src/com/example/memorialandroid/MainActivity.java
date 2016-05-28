@@ -10,7 +10,7 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
 
-public class MainActivity extends FragmentActivity{
+public class MainActivity extends FragmentActivity implements Debugable{
 
 	static TextView debugView;
 
@@ -28,11 +28,6 @@ public class MainActivity extends FragmentActivity{
 
 		// Set Debug
 		debugView = (TextView)findViewById(R.id.debug);
-
-		// Actual Code Start
-		String sampleText = getTextOfSample("sample.txt");
-
-		debug(sampleText);
 
 		//////////////////////////////////////////// Code Start
 
@@ -110,9 +105,17 @@ public class MainActivity extends FragmentActivity{
 				new ValButton((Button)findViewById(R.id.veryOften), 0) };
 	}
 
-	public static void countRows(){
+	public void countRows(){
 		try{
 			numrows = db.getCount();
+
+			if(numrows <= 1){
+				debug("Importing records");
+				String sqlQuery = getAssetContent("importSql.txt");
+				db.importRecords(sqlQuery, this);
+				numrows = db.getCount();
+				debug("New count is: " + numrows);
+			}
 		}
 		catch(Exception e){
 			debug(e.getMessage());
@@ -134,20 +137,31 @@ public class MainActivity extends FragmentActivity{
 			}
 			catch(Exception e){
 				debug(e.getMessage());
+				e.printStackTrace();
 			}
 		}
 	}
 
+	private static String getStackTrace(Exception e){
+		StringBuilder sb = new StringBuilder();
+		
+		for(StackTraceElement i: e.getStackTrace()){
+			sb.append("Line "+i.getLineNumber() + " in " + i.getMethodName() + '\n');
+		}
+		
+		return sb.toString();
+	}
+	
 	public static void buttonsEnabled(boolean b){
 		for(int i = buttons.length - 1; i >= 0; i--)
 			buttons[i].button.setEnabled(b);
 	}
 
 	private static void debug(String message){
-		debugView.setText(message);
+		debugView.setText(debugView.getText().toString() + '\n' + message);
 	}
 
-	private String getTextOfSample(String fileName){
+	private String getAssetContent(String fileName){
 		try{
 			InputStream fis = getResources().getAssets().open(fileName);
 
@@ -174,5 +188,9 @@ public class MainActivity extends FragmentActivity{
 		catch(IOException e){
 			throw new RuntimeException(e);
 		}
+	}
+
+	public void print(String message){
+		debug(message);
 	}
 }

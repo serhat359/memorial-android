@@ -23,8 +23,6 @@ public class MainActivity extends FragmentActivity implements Debugable{
 	static TextView atext;
 	static Button[] buttons;
 
-	// TODO font düzeltmesi yap, stil olsun MS Mincho gibi
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);

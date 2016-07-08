@@ -32,6 +32,39 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 		db.execSQL(indexQuery);
 	}
 
+	public void execQuery(String query){
+		SQLiteDatabase db = this.getWritableDatabase();
+
+		db.execSQL(query);
+	}
+
+	public Cursor execSelectQuery(String query){
+		SQLiteDatabase db = this.getWritableDatabase();
+
+		Cursor cursor = db.rawQuery(query, null);
+
+		return cursor;
+	}
+
+	public void beginTransaction(){
+		SQLiteDatabase db = this.getWritableDatabase();
+
+		db.beginTransaction();
+	}
+
+	public void commitTransaction(){
+		SQLiteDatabase db = this.getWritableDatabase();
+
+		db.setTransactionSuccessful();
+		db.endTransaction();
+	}
+
+	public void rollBackTransaction(){
+		SQLiteDatabase db = this.getWritableDatabase();
+
+		db.endTransaction();
+	}
+
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion){
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_CARDS);
@@ -102,6 +135,24 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 		}
 		catch(Exception e){
 			method.print(e.getMessage());
+		}
+	}
+
+	public void updateQuestion(String[] tokens){
+		Cursor rs = MainActivity.db
+				.execSelectQuery("SELECT back FROM cards WHERE front='" + tokens[0] + "'");
+
+		if(!rs.moveToFirst()){
+			MainActivity.db.execQuery("insert into cards (front, back, remaining)" + " values ('"
+					+ tokens[0] + "', '" + tokens[1] + "', '0')");
+		}
+		else{
+			String oldBack = rs.getString(rs.getColumnIndex(COL_BACK));
+
+			if(!oldBack.equalsIgnoreCase(tokens[1])){
+				MainActivity.db.execSelectQuery("update cards set back = '" + tokens[1]
+						+ "' where front = '" + tokens[0] + "'");
+			}
 		}
 	}
 }

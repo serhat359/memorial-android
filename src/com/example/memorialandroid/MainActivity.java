@@ -4,6 +4,7 @@ import android.support.v4.app.FragmentActivity;
 
 import java.io.*;
 
+import android.content.res.AssetManager;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.Menu;
@@ -14,7 +15,7 @@ import android.widget.TextView;
 
 public class MainActivity extends FragmentActivity implements Debugable{
 
-	static TextView debugView;
+	private static TextView debugView;
 
 	static DatabaseHandler db;
 	static int numrows = -1;
@@ -59,14 +60,27 @@ public class MainActivity extends FragmentActivity implements Debugable{
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item){
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if(id == R.id.action_settings){
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
+		switch (item.getItemId()) {
+	        case R.id.action_settings:
+	            // User chose the "Settings" item, show the app settings UI...
+	            return true;
+
+	        case R.id.update:
+	            try{
+					ActionHandler.runImport(getAssets());
+					start();
+				}
+				catch(Exception e){
+					debug(e);
+				}
+	        	return true;
+
+	        default:
+	            // If we got here, the user's action was not recognized.
+	            // Invoke the superclass to handle it.
+	            return super.onOptionsItemSelected(item);
+
+	    }
 	}
 
 	public void prepareGUI(){
@@ -116,13 +130,14 @@ public class MainActivity extends FragmentActivity implements Debugable{
 			}
 			catch(Exception e){
 				debug(e.getMessage());
-				e.printStackTrace();
 			}
 		}
 	}
 
 	public static String getStackTrace(Exception e){
 		StringBuilder sb = new StringBuilder();
+		
+		sb.append(e.getMessage() + '\n');
 
 		for(StackTraceElement i: e.getStackTrace()){
 			sb.append("Line " + i.getLineNumber() + " in " + i.getMethodName() + '\n');
@@ -156,16 +171,16 @@ public class MainActivity extends FragmentActivity implements Debugable{
 
 		start();
 	}
-
+	
 	@SuppressWarnings("unused")
-	private static void debug(String message){
-		// debugView.setText(debugView.getText().toString() + '\n' + message);
+	static void debug(String message){
+		//debugView.setText(debugView.getText().toString() + '\n' + message);
 	}
 
 	private String getAssetContent(String fileName){
 		try{
 			InputStream fis = getResources().getAssets().open(fileName);
-
+			
 			String text = readStream(fis);
 
 			return text;
@@ -175,6 +190,12 @@ public class MainActivity extends FragmentActivity implements Debugable{
 		}
 	}
 
+	public AssetManager getAssets(){
+		return getResources().getAssets();
+	}
+	
+	// TODO dump ekle 
+	
 	private static String readStream(InputStream is){
 		try{
 			StringBuilder sb = new StringBuilder(is.available());
@@ -191,6 +212,12 @@ public class MainActivity extends FragmentActivity implements Debugable{
 	}
 
 	public void print(String message){
+		debug(message);
+	}
+	
+	public void debug(Exception e){
+		String message = getStackTrace(e);
+		
 		debug(message);
 	}
 }

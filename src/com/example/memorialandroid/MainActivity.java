@@ -60,27 +60,27 @@ public class MainActivity extends FragmentActivity implements Debugable{
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item){
-		switch (item.getItemId()) {
-	        case R.id.action_settings:
-	            // User chose the "Settings" item, show the app settings UI...
-	            return true;
+		switch(item.getItemId()){
+			case R.id.action_settings:
+				// User chose the "Settings" item, show the app settings UI...
+				return true;
 
-	        case R.id.update:
-	            try{
+			case R.id.update:
+				try{
 					ActionHandler.runImport(getAssets());
 					start();
 				}
 				catch(Exception e){
 					debug(e);
 				}
-	        	return true;
+				return true;
 
-	        default:
-	            // If we got here, the user's action was not recognized.
-	            // Invoke the superclass to handle it.
-	            return super.onOptionsItemSelected(item);
+			default:
+				// If we got here, the user's action was not recognized.
+				// Invoke the superclass to handle it.
+				return super.onOptionsItemSelected(item);
 
-	    }
+		}
 	}
 
 	public void prepareGUI(){
@@ -136,7 +136,7 @@ public class MainActivity extends FragmentActivity implements Debugable{
 
 	public static String getStackTrace(Exception e){
 		StringBuilder sb = new StringBuilder();
-		
+
 		sb.append(e.getMessage() + '\n');
 
 		for(StackTraceElement i: e.getStackTrace()){
@@ -171,16 +171,16 @@ public class MainActivity extends FragmentActivity implements Debugable{
 
 		start();
 	}
-	
+
 	@SuppressWarnings("unused")
 	static void debug(String message){
-		//debugView.setText(debugView.getText().toString() + '\n' + message);
+		// debugView.setText(debugView.getText().toString() + '\n' + message);
 	}
 
 	private String getAssetContent(String fileName){
 		try{
 			InputStream fis = getResources().getAssets().open(fileName);
-			
+
 			String text = readStream(fis);
 
 			return text;
@@ -193,9 +193,9 @@ public class MainActivity extends FragmentActivity implements Debugable{
 	public AssetManager getAssets(){
 		return getResources().getAssets();
 	}
-	
-	// TODO dump ekle 
-	
+
+	// TODO dump ekle
+
 	private static String readStream(InputStream is){
 		try{
 			StringBuilder sb = new StringBuilder(is.available());
@@ -214,10 +214,10 @@ public class MainActivity extends FragmentActivity implements Debugable{
 	public void print(String message){
 		debug(message);
 	}
-	
+
 	public void debug(Exception e){
 		String message = getStackTrace(e);
-		
+
 		debug(message);
 	}
 }

@@ -16,6 +16,7 @@ import android.widget.TextView;
 public class MainActivity extends FragmentActivity implements Debugable{
 
 	private static TextView debugView;
+	private static boolean debugEnabled = false;
 
 	static DatabaseHandler db;
 	static int numrows = -1;
@@ -168,9 +169,9 @@ public class MainActivity extends FragmentActivity implements Debugable{
 		start();
 	}
 
-	@SuppressWarnings("unused")
 	static void debug(String message){
-		// debugView.setText(debugView.getText().toString() + '\n' + message);
+		if(debugEnabled)
+			debugView.setText(debugView.getText().toString() + '\n' + message);
 	}
 
 	private String getAssetContent(String fileName){

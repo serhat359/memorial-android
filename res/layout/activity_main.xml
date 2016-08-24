@@ -59,7 +59,8 @@
 
             <Button
                 android:id="@+id/veryRarely"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight=".30"
                 android:layout_height="wrap_content"
                 android:onClick="rateClicked"
                 android:tag="10"
@@ -67,7 +68,8 @@
 
             <Button
                 android:id="@+id/rarely"
-                android:layout_width="113dp"
+                android:layout_width="0dp"
+                android:layout_weight=".25"
                 android:layout_height="wrap_content"
                 android:onClick="rateClicked"
                 android:tag="3"
@@ -75,7 +77,8 @@
 
             <Button
                 android:id="@+id/often"
-                android:layout_width="113dp"
+                android:layout_width="0dp"
+                android:layout_weight=".25"
                 android:layout_height="wrap_content"
                 android:onClick="rateClicked"
                 android:tag="1"
@@ -83,7 +86,8 @@
 
             <Button
                 android:id="@+id/veryOften"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight=".30"
                 android:layout_height="wrap_content"
                 android:onClick="rateClicked"
                 android:tag="0"

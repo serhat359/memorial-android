@@ -1,5 +1,5 @@
 package com.example.memorialandroid;
 
 public interface Debugable{
-	public void print(String message);
+	public void debug(String message);
 }

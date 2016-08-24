@@ -118,7 +118,7 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 			db.endTransaction();
 		}
 		catch(Exception e){
-			method.print(e.getMessage());
+			method.debug(e.getMessage());
 		}
 	}
 
@@ -134,7 +134,7 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 					+ cursor.getString(cursor.getColumnIndex(COL_FRONT)) + "'");
 		}
 		catch(Exception e){
-			method.print(e.getMessage());
+			method.debug(e.getMessage());
 		}
 	}
 

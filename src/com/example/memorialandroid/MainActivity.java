@@ -67,7 +67,7 @@ public class MainActivity extends FragmentActivity implements Debugable{
 
 			case R.id.update:
 				try{
-					ActionHandler.runImport(getAssets());
+					ActionHandler.runImport(getAssets(), this);
 					start();
 				}
 				catch(Exception e){
@@ -169,7 +169,7 @@ public class MainActivity extends FragmentActivity implements Debugable{
 		start();
 	}
 
-	static void debug(String message){
+	public void debug(String message){
 		if(debugEnabled)
 			debugView.setText(debugView.getText().toString() + '\n' + message);
 	}

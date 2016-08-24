@@ -13,7 +13,7 @@ public class ActionHandler{
 
 	private static final String wordDefaultSeperator = " – ";
 	
-	public static boolean runImport(AssetManager assetManager)
+	public static boolean runImport(AssetManager assetManager, MainActivity activity)
 			throws FileNotFoundException, IOException, Exception{
 
 		String seperator = wordDefaultSeperator;
@@ -34,17 +34,17 @@ public class ActionHandler{
 				catch(ArrayIndexOutOfBoundsException e1){
 					String message = "Could not split \"" + line + "\"\n" + "Format is: \"word"
 							+ " - " + "word\"";
-					MainActivity.debug(message);
+					activity.debug(message);
 					break;
 				}
 			}
 
 			MainActivity.db.commitTransaction();
-			MainActivity.debug("Update successful!");
+			activity.debug("Update successful!");
 		}
 		catch(Exception e){
 			MainActivity.db.rollBackTransaction();
-			MainActivity.debug("Update failed");
+			activity.debug("Update failed");
 		}
 
 		br.close();

@@ -13,7 +13,7 @@ public class ActionHandler{
 
 	private static final String wordDefaultSeperator = " – ";
 	
-	public static boolean runImport(AssetManager assetManager, MainActivity activity)
+	public static boolean runImport(AssetManager assetManager, Debugable activity)
 			throws FileNotFoundException, IOException, Exception{
 
 		String seperator = wordDefaultSeperator;

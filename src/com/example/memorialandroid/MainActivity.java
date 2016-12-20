@@ -18,7 +18,7 @@ public class MainActivity extends FragmentActivity implements Debugable{
 	private static TextView debugView;
 	private static boolean debugEnabled = false;
 
-	static DatabaseHandler db;
+	private static DatabaseHandler db;
 	static int numrows = -1;
 	static Button show;
 	static TextView qtext;
@@ -67,7 +67,7 @@ public class MainActivity extends FragmentActivity implements Debugable{
 
 			case R.id.update:
 				try{
-					ActionHandler.runImport(getAssets(), this);
+					ActionHandler.runImport(getAssets(), this, db);
 					start();
 				}
 				catch(Exception e){

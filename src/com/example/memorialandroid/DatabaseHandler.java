@@ -1,5 +1,7 @@
 package com.example.memorialandroid;
 
+import java.io.BufferedReader;
+
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -30,39 +32,6 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 		String indexQuery = "CREATE UNIQUE INDEX frontIndex ON " + TABLE_CARDS + " (front)";
 
 		db.execSQL(indexQuery);
-	}
-
-	public void execQuery(String query){
-		SQLiteDatabase db = this.getWritableDatabase();
-
-		db.execSQL(query);
-	}
-
-	public Cursor execSelectQuery(String query){
-		SQLiteDatabase db = this.getWritableDatabase();
-
-		Cursor cursor = db.rawQuery(query, null);
-
-		return cursor;
-	}
-
-	public void beginTransaction(){
-		SQLiteDatabase db = this.getWritableDatabase();
-
-		db.beginTransaction();
-	}
-
-	public void commitTransaction(){
-		SQLiteDatabase db = this.getWritableDatabase();
-
-		db.setTransactionSuccessful();
-		db.endTransaction();
-	}
-
-	public void rollBackTransaction(){
-		SQLiteDatabase db = this.getWritableDatabase();
-
-		db.endTransaction();
 	}
 
 	@Override
@@ -138,21 +107,54 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 		}
 	}
 
-	public void updateQuestion(String[] tokens){
-		Cursor rs = MainActivity.db
-				.execSelectQuery("SELECT back FROM cards WHERE front='" + tokens[0] + "'");
+	private void updateQuestion(String[] tokens, SQLiteDatabase db){
+		Cursor rs = db.rawQuery("SELECT back FROM cards WHERE front='" + tokens[0] + "'", null);
 
 		if(!rs.moveToFirst()){
-			MainActivity.db.execQuery("insert into cards (front, back, remaining)" + " values ('"
-					+ tokens[0] + "', '" + tokens[1] + "', '0')");
+			db.execSQL("insert into cards (front, back, remaining)" + " values ('" + tokens[0]
+					+ "', '" + tokens[1] + "', '0')");
 		}
 		else{
 			String oldBack = rs.getString(rs.getColumnIndex(COL_BACK));
 
 			if(!oldBack.equalsIgnoreCase(tokens[1])){
-				MainActivity.db.execSelectQuery("update cards set back = '" + tokens[1]
-						+ "' where front = '" + tokens[0] + "'");
+				db.execSQL("update cards set back = '" + tokens[1] + "' where front = '" + tokens[0]
+						+ "'");
 			}
 		}
+
+		rs.close();
+	}
+
+	public void updateEntries(BufferedReader br, Debugable activity, String seperator){
+		SQLiteDatabase db = this.getWritableDatabase();
+
+		db.beginTransaction();
+
+		try{
+			for(String line = br.readLine(); line != null; line = br.readLine()){
+				String[] tokens = line.split(seperator, 2);
+
+				try{
+					updateQuestion(tokens, db);
+				}
+				catch(ArrayIndexOutOfBoundsException e1){
+					String message = "Could not split \"" + line + "\"\n" + "Format is: \"word"
+							+ " - " + "word\"";
+					activity.debug(message);
+					break;
+				}
+			}
+
+			db.setTransactionSuccessful();
+			db.endTransaction();
+			activity.debug("Update successful!");
+		}
+		catch(Exception e){
+			db.endTransaction();
+			activity.debug("Update failed");
+			activity.debug(e.getMessage());
+		}
+
 	}
 }

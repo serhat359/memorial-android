@@ -43,8 +43,7 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 	public int getCount(){
 		SQLiteDatabase db = this.getWritableDatabase();
 
-		Cursor cursor = db.rawQuery("select count(*) from cards", null);
-
+		cursor = db.rawQuery("select count(*) from cards", null);
 		cursor.moveToFirst();
 
 		int count = cursor.getInt(0);
@@ -59,7 +58,6 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 			int n = (int)(Math.random() * numrows);
 
 			cursor = db.rawQuery("select * from cards limit " + n + ",1", null);
-
 			cursor.moveToFirst();
 
 			int rem = cursor.getInt(cursor.getColumnIndex(COL_REMAINING));

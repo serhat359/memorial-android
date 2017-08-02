@@ -19,7 +19,7 @@ public class MainActivity extends FragmentActivity implements Debugable{
 	private static TextView debugView;
 	private static boolean debugEnabled = false;
 
-	private static DatabaseHandler db;
+	public static DatabaseHandler db;
 	static int numrows = -1;
 	static Button show;
 	static TextView qtext;
@@ -180,6 +180,7 @@ public class MainActivity extends FragmentActivity implements Debugable{
 		start();
 	}
 
+	@Override
 	public void debug(String message){
 		if(debugEnabled)
 			debugView.setText(debugView.getText().toString() + '\n' + message);

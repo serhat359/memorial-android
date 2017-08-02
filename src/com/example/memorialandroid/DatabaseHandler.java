@@ -1,6 +1,7 @@
 package com.example.memorialandroid;
 
 import java.io.BufferedReader;
+import java.util.ArrayList;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -154,5 +155,14 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 			activity.debug(e.getMessage());
 		}
 
+	}
+
+	public ArrayList<Card> getSearchResult(String s){
+		ArrayList<Card> list = new ArrayList<Card>();
+
+		list.add(new Card("front1", "back1"));
+		list.add(new Card("front2", "back2"));
+
+		return list;
 	}
 }

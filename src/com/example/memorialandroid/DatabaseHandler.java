@@ -17,7 +17,7 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 	private static final String COL_FRONT = "FRONT";
 	private static final String COL_BACK = "BACK";
 
-	private Cursor cursor;
+	private Cursor questionCursor;
 
 	public DatabaseHandler(Context context){
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -44,10 +44,12 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 	public int getCount(){
 		SQLiteDatabase db = this.getWritableDatabase();
 
-		cursor = db.rawQuery("select count(*) from cards", null);
+		Cursor cursor = db.rawQuery("select count(*) from cards", null);
 		cursor.moveToFirst();
 
 		int count = cursor.getInt(0);
+
+		cursor.close();
 
 		return count;
 	}
@@ -58,17 +60,33 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 		while(true){
 			int n = (int)(Math.random() * numrows);
 
-			cursor = db.rawQuery("select * from cards limit " + n + ",1", null);
-			cursor.moveToFirst();
+			questionCursor = db.rawQuery("select * from cards limit " + n + ",1", null);
+			questionCursor.moveToFirst();
 
-			int rem = cursor.getInt(cursor.getColumnIndex(COL_REMAINING));
+			int rem = questionCursor.getInt(questionCursor.getColumnIndex(COL_REMAINING));
 			if(rem == 0)
 				break;
 			db.execSQL("update cards set remaining='" + (rem - 1) + "' where front='"
-					+ cursor.getString(cursor.getColumnIndex(COL_FRONT)) + "'");
+					+ questionCursor.getString(questionCursor.getColumnIndex(COL_FRONT)) + "'");
 		}
 
-		return cursor.getString(cursor.getColumnIndex(COL_FRONT));
+		return questionCursor.getString(questionCursor.getColumnIndex(COL_FRONT));
+	}
+
+	public String getAnswer(){
+		return questionCursor.getString(questionCursor.getColumnIndex(COL_BACK));
+	}
+
+	public void setDegree(int degree, Debugable method){
+		SQLiteDatabase db = this.getWritableDatabase();
+
+		try{
+			db.execSQL("update cards set remaining='" + degree + "' where front='"
+					+ questionCursor.getString(questionCursor.getColumnIndex(COL_FRONT)) + "'");
+		}
+		catch(Exception e){
+			method.debug(e.getMessage());
+		}
 	}
 
 	public void importRecords(String sql, Debugable method){
@@ -90,35 +108,18 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 		}
 	}
 
-	public String getAnswer(){
-		return cursor.getString(cursor.getColumnIndex(COL_BACK));
-	}
-
-	public void setDegree(int degree, Debugable method){
-		SQLiteDatabase db = this.getWritableDatabase();
-
-		try{
-			db.execSQL("update cards set remaining='" + degree + "' where front='"
-					+ cursor.getString(cursor.getColumnIndex(COL_FRONT)) + "'");
-		}
-		catch(Exception e){
-			method.debug(e.getMessage());
-		}
-	}
-
 	private void updateQuestion(String[] tokens, SQLiteDatabase db){
 		Cursor rs = db.rawQuery("SELECT back FROM cards WHERE front='" + tokens[0] + "'", null);
 
 		if(!rs.moveToFirst()){
-			db.execSQL("insert into cards (front, back, remaining)" + " values ('" + tokens[0]
-					+ "', '" + tokens[1] + "', '0')");
+			db.execSQL("insert into cards (front, back, remaining)" + " values ('" + tokens[0] + "', '" + tokens[1]
+					+ "', '0')");
 		}
 		else{
 			String oldBack = rs.getString(rs.getColumnIndex(COL_BACK));
 
 			if(!oldBack.equalsIgnoreCase(tokens[1])){
-				db.execSQL("update cards set back = '" + tokens[1] + "' where front = '" + tokens[0]
-						+ "'");
+				db.execSQL("update cards set back = '" + tokens[1] + "' where front = '" + tokens[0] + "'");
 			}
 		}
 
@@ -138,8 +139,7 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 					updateQuestion(tokens, db);
 				}
 				catch(ArrayIndexOutOfBoundsException e1){
-					String message = "Could not split \"" + line + "\"\n" + "Format is: \"word"
-							+ " - " + "word\"";
+					String message = "Could not split \"" + line + "\"\n" + "Format is: \"word" + " - " + "word\"";
 					activity.debug(message);
 					break;
 				}
@@ -157,12 +157,38 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 
 	}
 
-	public ArrayList<Card> getSearchResult(String s){
-		ArrayList<Card> list = new ArrayList<Card>();
+	public ArrayList<Card> getSearchResult(String q){
+		String query = "SELECT * FROM cards WHERE back LIKE '%" + q + "%' limit 10";
 
-		list.add(new Card("front1", "back1"));
-		list.add(new Card("front2", "back2"));
+		ArrayList<Card> list = runSelectQuery(query);
 
 		return list;
+	}
+
+	private ArrayList<Card> runSelectQuery(String query){
+		ArrayList<Card> cards = new ArrayList<Card>();
+
+		SQLiteDatabase db = this.getWritableDatabase();
+		Cursor cursor = db.rawQuery(query, null);
+
+		if(cursor.moveToFirst()){
+			do{
+				Card card = cursorToCard(cursor);
+				cards.add(card);
+			}
+			while(cursor.moveToNext());
+		}
+		
+		cursor.close();
+		
+		return cards;
+	}
+
+	private Card cursorToCard(Cursor cursor){
+		Card card = new Card();
+		card.front = cursor.getString(0);
+		card.back = cursor.getString(1);
+		card.remaining = cursor.getInt(2);
+		return card;
 	}
 }

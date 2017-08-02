@@ -8,11 +8,11 @@ import android.widget.TextView;
 
 import java.util.List;
 
-public abstract class ListAdapter<E>extends BaseAdapter{
+public class ListAdapter extends BaseAdapter{
 
-	private final List<E> mData;
+	private final List<Card> mData;
 
-	public ListAdapter(List<E> map){
+	public ListAdapter(List<Card> map){
 		mData = map;
 	}
 
@@ -25,9 +25,9 @@ public abstract class ListAdapter<E>extends BaseAdapter{
 	public long getItemId(int position){
 		return 0;
 	}
-	
+
 	@Override
-	public E getItem(int position){
+	public Card getItem(int position){
 		return mData.get(position);
 	}
 
@@ -36,23 +36,19 @@ public abstract class ListAdapter<E>extends BaseAdapter{
 		final View result;
 
 		if(convertView == null){
-			result = LayoutInflater.from(parent.getContext()).inflate(android.R.layout.two_line_list_item ,
-					parent, false);
+			result = LayoutInflater.from(parent.getContext()).inflate(android.R.layout.two_line_list_item, parent,
+					false);
 		}
 		else{
 			result = convertView;
 		}
 
-		E element = getItem(position);
+		Card element = getItem(position);
 
-		((TextView)result.findViewById(android.R.id.text1)).setText(elementGetBack(element));
-		((TextView)result.findViewById(android.R.id.text2)).setText(elementGetFront(element));
+		((TextView)result.findViewById(android.R.id.text1)).setText(element.back);
+		((TextView)result.findViewById(android.R.id.text2)).setText(element.front);
 
 		return result;
 	}
-
-	abstract String elementGetFront(E element);
-
-	abstract String elementGetBack(E element);
 
 }

@@ -50,19 +50,7 @@ public class SearchActivity extends Activity{
 
 		ArrayList<Card> favorites = getDB().getSearchResult(s);
 
-		ListAdapter<Card> adapter = new ListAdapter<Card>(favorites){
-
-			@Override
-			String elementGetFront(Card element){
-				return element.front;
-			}
-
-			@Override
-			String elementGetBack(Card element){
-				return element.back;
-			}
-
-		};
+		ListAdapter adapter = new ListAdapter(favorites);
 
 		listView.setAdapter(adapter);
 		registerForContextMenu(listView);

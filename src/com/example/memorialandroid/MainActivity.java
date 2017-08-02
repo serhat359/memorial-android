@@ -101,9 +101,8 @@ public class MainActivity extends FragmentActivity implements Debugable{
 
 		qtext.setTypeface(Typeface.createFromAsset(getResources().getAssets(), "MSMINCHO.TTF"));
 
-		buttons = new Button[] { (Button)findViewById(R.id.veryRarely),
-				(Button)findViewById(R.id.rarely), (Button)findViewById(R.id.often),
-				(Button)findViewById(R.id.veryOften), };
+		buttons = new Button[] { (Button)findViewById(R.id.veryRarely), (Button)findViewById(R.id.rarely),
+				(Button)findViewById(R.id.often), (Button)findViewById(R.id.veryOften), };
 	}
 
 	public void countRows(){

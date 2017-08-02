@@ -178,9 +178,9 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 			}
 			while(cursor.moveToNext());
 		}
-		
+
 		cursor.close();
-		
+
 		return cards;
 	}
 

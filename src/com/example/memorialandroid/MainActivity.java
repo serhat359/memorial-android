@@ -4,6 +4,7 @@ import android.support.v4.app.FragmentActivity;
 
 import java.io.*;
 
+import android.content.Intent;
 import android.content.res.AssetManager;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -74,6 +75,16 @@ public class MainActivity extends FragmentActivity implements Debugable{
 					debug(e);
 				}
 				return true;
+
+			case R.id.search:
+				try{
+					Intent launchNewIntent = new Intent(this, SearchActivity.class);
+					startActivityForResult(launchNewIntent, 0);
+				}
+				catch(Exception e){
+					debug(e);
+				}
+				return false;
 
 			default:
 				return super.onOptionsItemSelected(item);
@@ -187,6 +198,7 @@ public class MainActivity extends FragmentActivity implements Debugable{
 		}
 	}
 
+	@Override
 	public AssetManager getAssets(){
 		return getResources().getAssets();
 	}

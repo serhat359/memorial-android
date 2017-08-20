@@ -9,9 +9,13 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,6 +24,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+@SuppressLint("InlinedApi")
 public class MainActivity extends FragmentActivity implements Debugable{
 
 	private static TextView debugView;
@@ -34,6 +39,10 @@ public class MainActivity extends FragmentActivity implements Debugable{
 
 	private static final int FILE_SELECT_FOR_EXPORT = 0;
 	private static final int FILE_SELECT_FOR_IMPORT = 1;
+
+	private static final int PERMISSION_REQUEST_CODE = 1;
+
+	private Runnable permissionGrantedAction = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
@@ -96,21 +105,40 @@ public class MainActivity extends FragmentActivity implements Debugable{
 				return false;
 
 			case R.id.export:
-				try{
-					showFileChooser(FILE_SELECT_FOR_EXPORT);
-				}
-				catch(Exception e){
-					debug(e);
-				}
+				requestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, new Runnable(){
+					@Override
+					public void run(){
+						try{
+							showFileChooser(FILE_SELECT_FOR_EXPORT);
+						}
+						catch(Exception e){
+							debug(e);
+						}
+					}
+				});
+
 				return false;
 
 			case R.id.importFromFile:
-				try{
-					showFileChooser(FILE_SELECT_FOR_IMPORT, "text/plain");
-				}
-				catch(Exception e){
-					debug(e);
-				}
+				DialogYesNo.showDialog(this, "Confirm Import", "This action will delete all data, continue?",
+						new Runnable(){
+							@Override
+							public void run(){
+								requestPermission(Manifest.permission.READ_EXTERNAL_STORAGE, new Runnable(){
+									@Override
+									public void run(){
+										try{
+											showFileChooser(FILE_SELECT_FOR_IMPORT, "text/plain");
+										}
+										catch(Exception e){
+											debug(e);
+										}
+									}
+
+								});
+							}
+						});
+
 				return true;
 
 			default:
@@ -141,7 +169,7 @@ public class MainActivity extends FragmentActivity implements Debugable{
 				if(resultCode == RESULT_OK){
 					// Get the path of the chosen file
 					String path = Functions.getPath(this, data.getData());
-					
+
 					if(path == null)
 						debug("Error: Path is null");
 
@@ -235,6 +263,34 @@ public class MainActivity extends FragmentActivity implements Debugable{
 		debug("you selected " + degree);
 
 		start();
+	}
+
+	@SuppressLint("NewApi")
+	public void requestPermission(String permissionID, Runnable onGettingPermission){
+
+		final boolean isAboveKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+
+		if(!isAboveKitKat){
+			onGettingPermission.run();
+		}
+		else{
+			permissionGrantedAction = onGettingPermission;
+
+			requestPermissions(new String[] { permissionID }, PERMISSION_REQUEST_CODE);
+		}
+	}
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults){
+		switch(requestCode){
+			case PERMISSION_REQUEST_CODE:
+				if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+					permissionGrantedAction.run();
+				}
+				else{
+					Toast.makeText(this, "Could not get the permission for that", Toast.LENGTH_SHORT).show();
+				}
+		}
 	}
 
 	@Override

@@ -12,5 +12,6 @@
     <string name="veryOften">Very Often</string>
     <string name="update">Update</string>
     <string name="search">Search</string>
+    <string name="export">Export</string>
 
 </resources>

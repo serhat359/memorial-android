@@ -165,6 +165,14 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 		return list;
 	}
 
+	public ArrayList<Card> getAllCards(){
+		String query = "SELECT * FROM cards";
+		
+		ArrayList<Card> list = runSelectQuery(query);
+
+		return list;
+	}
+	
 	private ArrayList<Card> runSelectQuery(String query){
 		ArrayList<Card> cards = new ArrayList<Card>();
 

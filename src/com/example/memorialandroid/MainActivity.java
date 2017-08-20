@@ -9,12 +9,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetManager;
-import android.database.Cursor;
 import android.graphics.Typeface;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -36,6 +33,7 @@ public class MainActivity extends FragmentActivity implements Debugable{
 	static Button[] buttons;
 
 	private static final int FILE_SELECT_FOR_EXPORT = 0;
+	private static final int FILE_SELECT_FOR_IMPORT = 1;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
@@ -99,12 +97,21 @@ public class MainActivity extends FragmentActivity implements Debugable{
 
 			case R.id.export:
 				try{
-					showFileChooser();
+					showFileChooser(FILE_SELECT_FOR_EXPORT);
 				}
 				catch(Exception e){
 					debug(e);
 				}
 				return false;
+
+			case R.id.importFromFile:
+				try{
+					showFileChooser(FILE_SELECT_FOR_IMPORT, "text/plain");
+				}
+				catch(Exception e){
+					debug(e);
+				}
+				return true;
 
 			default:
 				return super.onOptionsItemSelected(item);
@@ -118,12 +125,28 @@ public class MainActivity extends FragmentActivity implements Debugable{
 				if(resultCode == RESULT_OK){
 					// Get the path of the chosen file
 					// TODO this method chooses a file when it should be choosing a folder, fix it
-					String path = getPath(this, data.getData());
+					String path = Functions.getPath(this, data.getData());
 
 					String parentFolder = new File(path).getParent();
 
 					try{
 						exportDBToFolder(parentFolder);
+					}
+					catch(IOException e){
+						debug(e.getMessage());
+					}
+				}
+				break;
+			case FILE_SELECT_FOR_IMPORT:
+				if(resultCode == RESULT_OK){
+					// Get the path of the chosen file
+					String path = Functions.getPath(this, data.getData());
+					
+					if(path == null)
+						debug("Error: Path is null");
+
+					try{
+						importDBFromFile(path);
 					}
 					catch(IOException e){
 						debug(e.getMessage());
@@ -151,14 +174,6 @@ public class MainActivity extends FragmentActivity implements Debugable{
 	public void countRows(){
 		try{
 			numrows = db.getCount();
-
-			if(numrows <= 1){
-				debug("Importing records");
-				String sqlQuery = getAssetContent("importSql.txt");
-				db.importRecords(sqlQuery, this);
-				numrows = db.getCount();
-				debug("New count is: " + numrows);
-			}
 		}
 		catch(Exception e){
 			debug(e.getMessage());
@@ -228,43 +243,30 @@ public class MainActivity extends FragmentActivity implements Debugable{
 			debugView.setText(debugView.getText().toString() + '\n' + message);
 	}
 
-	private String getAssetContent(String fileName){
-		try{
-			InputStream fis = getResources().getAssets().open(fileName);
-
-			String text = readStream(fis);
-
-			return text;
-		}
-		catch(IOException e){
-			return e.getMessage();
-		}
-	}
-
 	@Override
 	public AssetManager getAssets(){
 		return getResources().getAssets();
 	}
 
-	private static String readStream(InputStream is){
-		try{
-			StringBuilder sb = new StringBuilder(is.available());
-			Reader r = new InputStreamReader(is, "UTF-8");
-			int c = 0;
-			while((c = r.read()) != -1){
-				sb.append((char)c);
-			}
-			return sb.toString();
-		}
-		catch(IOException e){
-			throw new RuntimeException(e);
-		}
+	private void importDBFromFile(String filePath) throws IOException{
+		debug("Importing records");
+		boolean isSuccessful = db.importRecords(filePath, this);
+		numrows = db.getCount();
+		debug("New count is: " + numrows);
+
+		if(isSuccessful)
+			Toast.makeText(this, "Successfully imported", Toast.LENGTH_SHORT).show();
+		else
+			Toast.makeText(this, "Import failed", Toast.LENGTH_SHORT).show();
+
+		start();
 	}
 
 	private void exportDBToFolder(String directory) throws IOException{
 		Date todaysDate = Calendar.getInstance().getTime();
 
-		String fileName = "Memorial Backup " + new SimpleDateFormat("yyyy-MM-dd").format(todaysDate) + ".txt";
+		String fileName = "Memorial Backup "
+				+ new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(todaysDate) + ".txt";
 
 		File filePath = new File(directory, fileName);
 
@@ -277,8 +279,8 @@ public class MainActivity extends FragmentActivity implements Debugable{
 
 			for(Card card: allCards){
 				String formatted = String.format(Locale.getDefault(),
-						"INSERT INTO `CARDS`(`FRONT`,`BACK`,`REMAINING`) VALUES ('%s','%s',%d);\n", card.front, card.back,
-						card.remaining);
+						"INSERT INTO `CARDS`(`FRONT`,`BACK`,`REMAINING`) VALUES ('%s','%s',%d);\n", card.front,
+						card.back, card.remaining);
 
 				out.write(formatted);
 			}
@@ -297,32 +299,17 @@ public class MainActivity extends FragmentActivity implements Debugable{
 		}
 	}
 
-	private static String getPath(Context context, Uri uri){
-		if("content".equalsIgnoreCase(uri.getScheme())){
-			String[] projection = { "_data" };
-			Cursor cursor = null;
-
-			cursor = context.getContentResolver().query(uri, projection, null, null, null);
-			int column_index = cursor.getColumnIndexOrThrow("_data");
-			if(cursor.moveToFirst()){
-				return cursor.getString(column_index);
-			}
-		}
-		else if("file".equalsIgnoreCase(uri.getScheme())){
-			return uri.getPath();
-		}
-
-		return null;
+	private void showFileChooser(int requestCode){
+		showFileChooser(requestCode, "*/*");
 	}
 
-	private void showFileChooser(){
+	private void showFileChooser(int requestCode, String fileType){
 		Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-		intent.setType("*/*");
+		intent.setType(fileType);
 		intent.addCategory(Intent.CATEGORY_OPENABLE);
 
 		try{
-			startActivityForResult(Intent.createChooser(intent, "Select a folder to save the file"),
-					FILE_SELECT_FOR_EXPORT);
+			startActivityForResult(Intent.createChooser(intent, "Select a folder to save the file"), requestCode);
 		}
 		catch(android.content.ActivityNotFoundException ex){
 			Toast.makeText(this, "Please install a File Manager.", Toast.LENGTH_SHORT).show();

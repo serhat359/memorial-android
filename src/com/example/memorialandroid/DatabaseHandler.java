@@ -1,6 +1,8 @@
 package com.example.memorialandroid;
 
 import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import android.content.Context;
@@ -89,23 +91,42 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 		}
 	}
 
-	public void importRecords(String sql, Debugable method){
+	public boolean importRecords(String filePath, Debugable method) throws IOException{
 		SQLiteDatabase db = this.getWritableDatabase();
 
+		boolean isSuccessful = false;
+		
+		BufferedReader br = null;
 		try{
 			db.beginTransaction();
 			db.execSQL("delete from " + TABLE_CARDS);
 
-			for(String s: sql.split("\n")){
-				db.execSQL(s);
+			method.debug("deleted all records");
+			
+			br = new BufferedReader(new FileReader(filePath));
+			String line = null;
+			while((line = br.readLine()) != null){
+				db.execSQL(line);
 			}
+			
+			method.debug("inserted all records");
 
 			db.setTransactionSuccessful();
 			db.endTransaction();
+			
+			isSuccessful = true;
 		}
 		catch(Exception e){
 			method.debug(e.getMessage());
+			
+			db.endTransaction();
 		}
+		finally{
+			if(br != null)
+				br.close();
+		}
+		
+		return isSuccessful;
 	}
 
 	private void updateQuestion(String[] tokens, SQLiteDatabase db){
@@ -167,12 +188,12 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 
 	public ArrayList<Card> getAllCards(){
 		String query = "SELECT * FROM cards";
-		
+
 		ArrayList<Card> list = runSelectQuery(query);
 
 		return list;
 	}
-	
+
 	private ArrayList<Card> runSelectQuery(String query){
 		ArrayList<Card> cards = new ArrayList<Card>();
 

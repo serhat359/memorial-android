@@ -91,7 +91,7 @@ public class MainActivity extends FragmentActivity implements Debugable{
 
 			case R.id.update:
 				try{
-					ActionHandler.runImport(getAssets(), this, db);
+					ActionHandler.runUpdate(getAssets(), this, db);
 					Toast.makeText(this, "Update Completed", Toast.LENGTH_SHORT).show();
 					start();
 				}

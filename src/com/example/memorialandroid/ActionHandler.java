@@ -13,7 +13,7 @@ public class ActionHandler{
 
 	private static final String wordDefaultSeperator = " – ";
 
-	public static boolean runImport(AssetManager assetManager, Debugable activity, DatabaseHandler db)
+	public static boolean runUpdate(AssetManager assetManager, Debugable activity, DatabaseHandler db)
 			throws FileNotFoundException, IOException, Exception{
 
 		String seperator = wordDefaultSeperator;
@@ -22,7 +22,7 @@ public class ActionHandler{
 		BufferedReader br = new BufferedReader(new InputStreamReader(fis, Charset.forName("UTF-8")));
 
 		db.updateEntries(br, activity, seperator);
-
+		
 		br.close();
 		return true;
 	}

@@ -95,37 +95,37 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 		SQLiteDatabase db = this.getWritableDatabase();
 
 		boolean isSuccessful = false;
-		
+
 		BufferedReader br = null;
 		try{
 			db.beginTransaction();
 			db.execSQL("delete from " + TABLE_CARDS);
 
 			method.debug("deleted all records");
-			
+
 			br = new BufferedReader(new FileReader(filePath));
 			String line = null;
 			while((line = br.readLine()) != null){
 				db.execSQL(line);
 			}
-			
+
 			method.debug("inserted all records");
 
 			db.setTransactionSuccessful();
 			db.endTransaction();
-			
+
 			isSuccessful = true;
 		}
 		catch(Exception e){
 			method.debug(e.getMessage());
-			
+
 			db.endTransaction();
 		}
 		finally{
 			if(br != null)
 				br.close();
 		}
-		
+
 		return isSuccessful;
 	}
 
@@ -179,9 +179,11 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 	}
 
 	public ArrayList<Card> getSearchResult(String q){
-		String query = "SELECT * FROM cards WHERE back LIKE '%" + q + "%' limit 10";
+		String query = "SELECT * FROM cards WHERE back LIKE ? or front like ? limit 10";
 
-		ArrayList<Card> list = runSelectQuery(query);
+		String arg = "%" + q + "%";
+
+		ArrayList<Card> list = runSelectQuery(query, new String[] { arg, arg });
 
 		return list;
 	}
@@ -195,10 +197,14 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 	}
 
 	private ArrayList<Card> runSelectQuery(String query){
+		return runSelectQuery(query, null);
+	}
+
+	private ArrayList<Card> runSelectQuery(String query, String[] args){
 		ArrayList<Card> cards = new ArrayList<Card>();
 
 		SQLiteDatabase db = this.getWritableDatabase();
-		Cursor cursor = db.rawQuery(query, null);
+		Cursor cursor = db.rawQuery(query, args);
 
 		if(cursor.moveToFirst()){
 			do{

@@ -36,6 +36,7 @@ public class MainActivity extends FragmentActivity implements Debugable{
 	private static boolean debugEnabled = false;
 
 	public static DatabaseHandler db;
+	public static Typeface fontFamily;
 	static int numrows = -1;
 	static Button show;
 	static TextView qtext;
@@ -199,7 +200,9 @@ public class MainActivity extends FragmentActivity implements Debugable{
 		atext = (TextView)findViewById(R.id.answerView);
 		qtext = (TextView)findViewById(R.id.questionView);
 
-		qtext.setTypeface(Typeface.createFromAsset(getResources().getAssets(), "MSMINCHO.TTF"));
+		fontFamily = Typeface.createFromAsset(getResources().getAssets(), "MSMINCHO.TTF");
+
+		qtext.setTypeface(fontFamily);
 
 		buttons = new Button[] { (Button)findViewById(R.id.veryRarely), (Button)findViewById(R.id.rarely),
 				(Button)findViewById(R.id.often), (Button)findViewById(R.id.veryOften), };

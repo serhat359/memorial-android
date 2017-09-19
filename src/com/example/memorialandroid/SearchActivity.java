@@ -1,14 +1,18 @@
 package com.example.memorialandroid;
 
 import java.util.ArrayList;
-
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 public class SearchActivity extends Activity{
 
@@ -48,9 +52,24 @@ public class SearchActivity extends Activity{
 	public void performSearch(String s){
 		ListView listView = (ListView)findViewById(R.id.searchResultListView);
 
-		ArrayList<Card> favorites = getDB().getSearchResult(s);
+		listView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
 
-		ListAdapter adapter = new ListAdapter(favorites);
+			@SuppressLint("NewApi")
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id){
+				String frontMessage = ((TextView)view.findViewById(android.R.id.text2)).getText().toString();
+
+				Functions.copyStringToClipboard(SearchActivity.this, frontMessage);
+				Toast.makeText(SearchActivity.this, "Text copied", Toast.LENGTH_SHORT).show();
+
+				DialogMessage.showDialog(SearchActivity.this, frontMessage);
+			}
+
+		});
+
+		ArrayList<Card> cards = getDB().getSearchResult(s);
+
+		ListAdapter adapter = new ListAdapter(cards);
 
 		listView.setAdapter(adapter);
 		registerForContextMenu(listView);

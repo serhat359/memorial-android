@@ -179,7 +179,7 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 	}
 
 	public ArrayList<Card> getSearchResult(String q){
-		String query = "SELECT * FROM cards WHERE back LIKE ? or front like ? limit 10";
+		String query = "SELECT * FROM cards WHERE back LIKE ? or front like ?";
 
 		String arg = "%" + q + "%";
 

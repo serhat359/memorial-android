@@ -50,29 +50,31 @@ public class SearchActivity extends Activity{
 	}
 
 	public void performSearch(String s){
-		ListView listView = (ListView)findViewById(R.id.searchResultListView);
+		if(s.length() != 0){
+			ListView listView = (ListView)findViewById(R.id.searchResultListView);
 
-		listView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+			listView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
 
-			@SuppressLint("NewApi")
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-				String frontMessage = ((TextView)view.findViewById(android.R.id.text2)).getText().toString();
+				@SuppressLint("NewApi")
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view, int position, long id){
+					String frontMessage = ((TextView)view.findViewById(android.R.id.text2)).getText().toString();
 
-				Functions.copyStringToClipboard(SearchActivity.this, frontMessage);
-				Toast.makeText(SearchActivity.this, "Text copied", Toast.LENGTH_SHORT).show();
+					Functions.copyStringToClipboard(SearchActivity.this, frontMessage);
+					Toast.makeText(SearchActivity.this, "Text copied", Toast.LENGTH_SHORT).show();
 
-				DialogMessage.showDialog(SearchActivity.this, frontMessage);
-			}
+					DialogMessage.showDialog(SearchActivity.this, frontMessage);
+				}
 
-		});
+			});
 
-		ArrayList<Card> cards = getDB().getSearchResult(s);
+			ArrayList<Card> cards = getDB().getSearchResult(s);
 
-		ListAdapter adapter = new ListAdapter(cards);
+			ListAdapter adapter = new ListAdapter(cards);
 
-		listView.setAdapter(adapter);
-		registerForContextMenu(listView);
+			listView.setAdapter(adapter);
+			registerForContextMenu(listView);
+		}
 	}
 
 	private DatabaseHandler getDB(){

@@ -14,5 +14,6 @@
     <string name="search">Search</string>
     <string name="export">Export</string>
     <string name="importFromFile">Import</string>
+    <string name="wholeWord">Whole Word</string>
     
 </resources>

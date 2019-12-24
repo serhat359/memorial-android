@@ -10,7 +10,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-public class DatabaseHandler extends SQLiteOpenHelper{
+public class DatabaseHandler extends SQLiteOpenHelper {
 
 	private static final int DATABASE_VERSION = 1;
 	private static final String DATABASE_NAME = "cardsManager";
@@ -21,7 +21,7 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 
 	private Cursor questionCursor;
 
-	public DatabaseHandler(Context context){
+	public DatabaseHandler(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 	}
 
@@ -59,8 +59,8 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 	public String getQuestion(int numrows){
 		SQLiteDatabase db = this.getWritableDatabase();
 
-		while(true){
-			int n = (int)(Math.random() * numrows);
+		while (true){
+			int n = (int) (Math.random() * numrows);
 
 			questionCursor = db.rawQuery("select * from cards limit " + n + ",1", null);
 			questionCursor.moveToFirst();
@@ -86,7 +86,7 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 			db.execSQL("update cards set remaining='" + degree + "' where front='"
 					+ questionCursor.getString(questionCursor.getColumnIndex(COL_FRONT)) + "'");
 		}
-		catch(Exception e){
+		catch (Exception e){
 			method.debug(e.getMessage());
 		}
 	}
@@ -105,7 +105,7 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 
 			br = new BufferedReader(new FileReader(filePath));
 			String line = null;
-			while((line = br.readLine()) != null){
+			while ((line = br.readLine()) != null){
 				db.execSQL(line);
 			}
 
@@ -116,7 +116,7 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 
 			isSuccessful = true;
 		}
-		catch(Exception e){
+		catch (Exception e){
 			method.debug(e.getMessage());
 
 			db.endTransaction();
@@ -159,7 +159,7 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 				try{
 					updateQuestion(tokens, db);
 				}
-				catch(ArrayIndexOutOfBoundsException e1){
+				catch (ArrayIndexOutOfBoundsException e1){
 					String message = "Could not split \"" + line + "\"\n" + "Format is: \"word" + " - " + "word\"";
 					activity.debug(message);
 					break;
@@ -170,7 +170,7 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 			db.endTransaction();
 			activity.debug("Update successful!");
 		}
-		catch(Exception e){
+		catch (Exception e){
 			db.endTransaction();
 			activity.debug("Update failed");
 			activity.debug(e.getMessage());
@@ -178,12 +178,28 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 
 	}
 
-	public ArrayList<Card> getSearchResult(String q){
-		String query = "SELECT * FROM cards WHERE back LIKE ? or front like ?";
+	public ArrayList<Card> getSearchResult(String q, boolean isWholeWord){
+		ArrayList<Card> list;
 
-		String arg = "%" + q + "%";
+		if(!isWholeWord){
+			String arg = "%" + q + "%";
 
-		ArrayList<Card> list = runSelectQuery(query, new String[] { arg, arg });
+			String query = "SELECT * FROM cards WHERE back LIKE ? or front like ?";
+
+			list = runSelectQuery(query, new String[] { arg, arg });
+		}
+		else{
+			String arg1 = q + " %";
+			String arg2 = "% " + q;
+			String arg3 = "% " + q + " %";
+
+			String where1 = "(front LIKE ? or front LIKE ? or front LIKE ?)";
+			String where2 = "(back  LIKE ? or back  LIKE ? or back  LIKE ?)";
+
+			String query = String.format("SELECT * FROM cards WHERE (%s or %s)", where1, where2);
+
+			list = runSelectQuery(query, new String[] { arg1, arg2, arg3, arg1, arg2, arg3 });
+		}
 
 		return list;
 	}
@@ -211,7 +227,7 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 				Card card = cursorToCard(cursor);
 				cards.add(card);
 			}
-			while(cursor.moveToNext());
+			while (cursor.moveToNext());
 		}
 
 		cursor.close();

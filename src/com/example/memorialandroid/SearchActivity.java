@@ -8,21 +8,18 @@ import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
 
-public class SearchActivity extends Activity{
+public class SearchActivity extends Activity {
 
+	CheckBox wholeWordCheckBox;
 	EditText searchEditText;
 
 	final Handler composingHandler = new Handler();
-	final Runnable composingRunnable = new Runnable(){
+	final Runnable composingRunnable = new Runnable() {
 		@Override
 		public void run(){
-			performSearch(searchEditText.getText().toString());
+			performSearch(searchEditText.getText().toString(), wholeWordCheckBox.isChecked());
 		}
 	};
 
@@ -31,8 +28,17 @@ public class SearchActivity extends Activity{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.search);
 
-		searchEditText = (EditText)findViewById(R.id.searchInDictionary);
-		searchEditText.addTextChangedListener(new TextWatcher(){
+		wholeWordCheckBox = (CheckBox) findViewById(R.id.checkbox_wholeWord);
+		wholeWordCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked){
+				composingHandler.removeCallbacks(composingRunnable);
+				composingHandler.postDelayed(composingRunnable, 500);
+			}
+		});
+
+		searchEditText = (EditText) findViewById(R.id.searchInDictionary);
+		searchEditText.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void afterTextChanged(final Editable s){
 				composingHandler.removeCallbacks(composingRunnable);
@@ -49,16 +55,16 @@ public class SearchActivity extends Activity{
 		});
 	}
 
-	public void performSearch(String s){
-		if(s.length() != 0){
-			ListView listView = (ListView)findViewById(R.id.searchResultListView);
+	public void performSearch(String s, boolean isWholeWord){
+		if(s.length() > 0){
+			ListView listView = (ListView) findViewById(R.id.searchResultListView);
 
-			listView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+			listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
 				@SuppressLint("NewApi")
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-					String frontMessage = ((TextView)view.findViewById(android.R.id.text2)).getText().toString();
+					String frontMessage = ((TextView) view.findViewById(android.R.id.text2)).getText().toString();
 
 					Functions.copyStringToClipboard(SearchActivity.this, frontMessage);
 					Toast.makeText(SearchActivity.this, "Text copied", Toast.LENGTH_SHORT).show();
@@ -68,7 +74,7 @@ public class SearchActivity extends Activity{
 
 			});
 
-			ArrayList<Card> cards = getDB().getSearchResult(s);
+			ArrayList<Card> cards = getDB().getSearchResult(s, isWholeWord);
 
 			ListAdapter adapter = new ListAdapter(cards);
 

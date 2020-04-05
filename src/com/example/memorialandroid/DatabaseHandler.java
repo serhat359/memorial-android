@@ -192,13 +192,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String arg1 = q + " %";
 			String arg2 = "% " + q;
 			String arg3 = "% " + q + " %";
+			String arg4 = q;
 
-			String where1 = "(front LIKE ? or front LIKE ? or front LIKE ?)";
-			String where2 = "(back  LIKE ? or back  LIKE ? or back  LIKE ?)";
+			String where1 = "(front LIKE ? or front LIKE ? or front LIKE ? or front LIKE ?)";
+			String where2 = "(back  LIKE ? or back  LIKE ? or back  LIKE ? or back  LIKE ?)";
 
 			String query = String.format("SELECT * FROM cards WHERE (%s or %s)", where1, where2);
 
-			list = runSelectQuery(query, new String[] { arg1, arg2, arg3, arg1, arg2, arg3 });
+			list = runSelectQuery(query, new String[] { arg1, arg2, arg3, arg4, arg1, arg2, arg3, arg4 });
 		}
 
 		return list;

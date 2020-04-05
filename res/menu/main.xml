@@ -21,4 +21,7 @@
     <item android:id="@+id/importFromFile" 
           android:title="@string/importFromFile"></item>
     
+    <item android:id="@+id/profile" 
+          android:title="@string/profile"></item>
+    
 </menu>

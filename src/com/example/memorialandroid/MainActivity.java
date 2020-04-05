@@ -30,11 +30,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 @SuppressLint("InlinedApi")
-public class MainActivity extends FragmentActivity implements Debugable{
+public class MainActivity extends FragmentActivity implements Debugable {
 
 	private static TextView debugView;
 	private static boolean debugEnabled = false;
 
+	public static MainActivity instance;
 	public static DatabaseHandler db;
 	public static Typeface fontFamily;
 	static int numrows = -1;
@@ -47,6 +48,8 @@ public class MainActivity extends FragmentActivity implements Debugable{
 	private static final int FILE_SELECT_FOR_IMPORT = 1;
 
 	private static final int PERMISSION_REQUEST_CODE = 1;
+	private static final int SEARCH_REQUEST_CODE = 2;
+	private static final int PROFILE_REQUEST_CODE = 3;
 
 	private Runnable permissionGrantedAction = null;
 
@@ -55,8 +58,10 @@ public class MainActivity extends FragmentActivity implements Debugable{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+		instance = this;
+
 		// Set Debug
-		debugView = (TextView)findViewById(R.id.debug);
+		debugView = (TextView) findViewById(R.id.debug);
 		debugView.setText("");
 
 		//////////////////////////////////////////// Code Start
@@ -65,6 +70,7 @@ public class MainActivity extends FragmentActivity implements Debugable{
 
 		createDatabase();
 		prepareGUI();
+		initializeDb();
 		countRows();
 		start();
 
@@ -86,108 +92,122 @@ public class MainActivity extends FragmentActivity implements Debugable{
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item){
-		switch(item.getItemId()){
-			case R.id.action_settings:
-				return true;
+		switch (item.getItemId()) {
+		case R.id.action_settings:
+			return true;
 
-			case R.id.update:
-				try{
-					ActionHandler.runUpdate(getAssets(), this, db);
-					Toast.makeText(this, "Update Completed", Toast.LENGTH_SHORT).show();
-					start();
-				}
-				catch(Exception e){
-					debug(e);
-				}
-				return true;
+		case R.id.update:
+			try{
+				ActionHandler.runUpdate(getAssets(), this, db);
+				Toast.makeText(this, "Update Completed", Toast.LENGTH_SHORT).show();
+				start();
+			}
+			catch (Exception e){
+				debug(e);
+			}
+			return true;
 
-			case R.id.search:
-				try{
-					Intent launchNewIntent = new Intent(this, SearchActivity.class);
-					startActivityForResult(launchNewIntent, 0);
-				}
-				catch(Exception e){
-					debug(e);
-				}
-				return false;
+		case R.id.search:
+			try{
+				Intent launchNewIntent = new Intent(this, SearchActivity.class);
+				startActivityForResult(launchNewIntent, SEARCH_REQUEST_CODE);
+			}
+			catch (Exception e){
+				debug(e);
+			}
+			return false;
 
-			case R.id.export:
-				requestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, new Runnable(){
-					@Override
-					public void run(){
-						try{
-							showFileChooser(FILE_SELECT_FOR_EXPORT);
-						}
-						catch(Exception e){
-							debug(e);
-						}
+		case R.id.profile:
+			try{
+				Intent launchNewIntent = new Intent(this, ProfileActivity.class);
+				startActivityForResult(launchNewIntent, PROFILE_REQUEST_CODE);
+			}
+			catch (Exception e){
+				debug(e);
+			}
+			return true;
+
+		case R.id.export:
+			requestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, new Runnable() {
+				@Override
+				public void run(){
+					try{
+						showFileChooser(FILE_SELECT_FOR_EXPORT);
 					}
-				});
+					catch (Exception e){
+						debug(e);
+					}
+				}
+			});
 
-				return false;
+			return false;
 
-			case R.id.importFromFile:
-				DialogYesNo.showDialog(this, "Confirm Import", "This action will delete all data, continue?",
-						new Runnable(){
-							@Override
-							public void run(){
-								requestPermission(Manifest.permission.READ_EXTERNAL_STORAGE, new Runnable(){
-									@Override
-									public void run(){
-										try{
-											showFileChooser(FILE_SELECT_FOR_IMPORT, "text/plain");
-										}
-										catch(Exception e){
-											debug(e);
-										}
+		case R.id.importFromFile:
+			DialogYesNo.showDialog(this, "Confirm Import", "This action will delete all data, continue?",
+					new Runnable() {
+						@Override
+						public void run(){
+							requestPermission(Manifest.permission.READ_EXTERNAL_STORAGE, new Runnable() {
+								@Override
+								public void run(){
+									try{
+										showFileChooser(FILE_SELECT_FOR_IMPORT, "text/plain");
 									}
+									catch (Exception e){
+										debug(e);
+									}
+								}
 
-								});
-							}
-						});
+							});
+						}
+					});
 
-				return true;
+			return true;
 
-			default:
-				return super.onOptionsItemSelected(item);
+		default:
+			return super.onOptionsItemSelected(item);
 		}
 	}
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data){
-		switch(requestCode){
-			case FILE_SELECT_FOR_EXPORT:
-				if(resultCode == RESULT_OK){
-					// Get the path of the chosen file
-					// TODO this method chooses a file when it should be choosing a folder, fix it
-					String path = Functions.getPath(this, data.getData());
+		switch (requestCode) {
+		case FILE_SELECT_FOR_EXPORT:
+			if(resultCode == RESULT_OK){
+				// Get the path of the chosen file
+				// TODO this method chooses a file when it should be choosing a folder, fix it
+				String path = Functions.getPath(this, data.getData());
 
-					String parentFolder = new File(path).getParent();
+				String parentFolder = new File(path).getParent();
 
-					try{
-						exportDBToFolder(parentFolder);
-					}
-					catch(IOException e){
-						debug(e.getMessage());
-					}
+				try{
+					exportDBToFolder(parentFolder);
 				}
-				break;
-			case FILE_SELECT_FOR_IMPORT:
-				if(resultCode == RESULT_OK){
-					// Get the path of the chosen file
-					String path = Functions.getPath(this, data.getData());
-
-					if(path == null)
-						debug("Error: Path is null");
-
-					try{
-						importDBFromFile(path);
-					}
-					catch(IOException e){
-						debug(e.getMessage());
-					}
+				catch (IOException e){
+					debug(e.getMessage());
 				}
-				break;
+			}
+			break;
+		case FILE_SELECT_FOR_IMPORT:
+			if(resultCode == RESULT_OK){
+				// Get the path of the chosen file
+				String path = Functions.getPath(this, data.getData());
+
+				if(path == null)
+					debug("Error: Path is null");
+
+				try{
+					importDBFromFile(path);
+				}
+				catch (IOException e){
+					debug(e.getMessage());
+				}
+			}
+			break;
+		case PROFILE_REQUEST_CODE:
+			countRows();
+			start();
+			break;
 		}
 		super.onActivityResult(requestCode, resultCode, data);
 	}
@@ -196,23 +216,32 @@ public class MainActivity extends FragmentActivity implements Debugable{
 		System.setProperty("awt.useSystemAAFontSettings", "on");
 		System.setProperty("swing.aatext", "true");
 
-		show = (Button)findViewById(R.id.showAnswer);
-		atext = (TextView)findViewById(R.id.answerView);
-		qtext = (TextView)findViewById(R.id.questionView);
+		show = (Button) findViewById(R.id.showAnswer);
+		atext = (TextView) findViewById(R.id.answerView);
+		qtext = (TextView) findViewById(R.id.questionView);
 
 		fontFamily = Typeface.createFromAsset(getResources().getAssets(), "MSMINCHO.TTF");
 
 		qtext.setTypeface(fontFamily);
 
-		buttons = new Button[] { (Button)findViewById(R.id.veryRarely), (Button)findViewById(R.id.rarely),
-				(Button)findViewById(R.id.often), (Button)findViewById(R.id.veryOften), };
+		buttons = new Button[] { (Button) findViewById(R.id.veryRarely), (Button) findViewById(R.id.rarely),
+				(Button) findViewById(R.id.often), (Button) findViewById(R.id.veryOften), };
+	}
+
+	public void initializeDb(){
+		try{
+			db.checkProfile();
+		}
+		catch (Exception e){
+			debug(e.getMessage());
+		}
 	}
 
 	public void countRows(){
 		try{
 			numrows = db.getCount();
 		}
-		catch(Exception e){
+		catch (Exception e){
 			debug(e.getMessage());
 		}
 	}
@@ -230,7 +259,7 @@ public class MainActivity extends FragmentActivity implements Debugable{
 			try{
 				qtext.setText(db.getQuestion(numrows));
 			}
-			catch(Exception e){
+			catch (Exception e){
 				debug(e.getMessage());
 			}
 		}
@@ -241,7 +270,7 @@ public class MainActivity extends FragmentActivity implements Debugable{
 
 		sb.append(e.getMessage() + '\n');
 
-		for(StackTraceElement i: e.getStackTrace()){
+		for(StackTraceElement i : e.getStackTrace()){
 			sb.append("Line " + i.getLineNumber() + " in " + i.getMethodName() + '\n');
 		}
 
@@ -261,9 +290,9 @@ public class MainActivity extends FragmentActivity implements Debugable{
 	}
 
 	public void rateClicked(View v){
-		Button button = (Button)v;
+		Button button = (Button) v;
 
-		int degree = Integer.parseInt((String)button.getTag());
+		int degree = Integer.parseInt((String) button.getTag());
 
 		buttonsEnabled(false);
 
@@ -291,14 +320,14 @@ public class MainActivity extends FragmentActivity implements Debugable{
 
 	@Override
 	public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults){
-		switch(requestCode){
-			case PERMISSION_REQUEST_CODE:
-				if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-					permissionGrantedAction.run();
-				}
-				else{
-					Toast.makeText(this, "Could not get the permission for that", Toast.LENGTH_SHORT).show();
-				}
+		switch (requestCode) {
+		case PERMISSION_REQUEST_CODE:
+			if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+				permissionGrantedAction.run();
+			}
+			else{
+				Toast.makeText(this, "Could not get the permission for that", Toast.LENGTH_SHORT).show();
+			}
 		}
 	}
 
@@ -342,7 +371,7 @@ public class MainActivity extends FragmentActivity implements Debugable{
 		try{
 			out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePath.getAbsolutePath()), "UTF-8"));
 
-			for(Card card: allCards){
+			for(Card card : allCards){
 				String formatted = String.format(Locale.getDefault(),
 						"INSERT INTO `CARDS`(`FRONT`,`BACK`,`REMAINING`) VALUES ('%s','%s',%d);\n", card.front,
 						card.back, card.remaining);
@@ -352,7 +381,7 @@ public class MainActivity extends FragmentActivity implements Debugable{
 
 			isSuccessful = true;
 		}
-		catch(Exception e){
+		catch (Exception e){
 			debug(e.getMessage());
 		}
 		finally{
@@ -376,7 +405,7 @@ public class MainActivity extends FragmentActivity implements Debugable{
 		try{
 			startActivityForResult(Intent.createChooser(intent, "Select a folder to save the file"), requestCode);
 		}
-		catch(android.content.ActivityNotFoundException ex){
+		catch (android.content.ActivityNotFoundException ex){
 			Toast.makeText(this, "Please install a File Manager.", Toast.LENGTH_SHORT).show();
 		}
 	}

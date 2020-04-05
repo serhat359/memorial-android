@@ -6,14 +6,35 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class ListAdapter extends BaseAdapter{
+public class ListAdapter extends BaseAdapter {
 
-	private final List<Card> mData;
+	private final List<ListAdapterObject> mData;
 
-	public ListAdapter(List<Card> map){
-		mData = map;
+	private ListAdapter(List<ListAdapterObject> list) {
+		mData = list;
+	}
+
+	public static ListAdapter fromStrings(List<String> strings){
+		ArrayList<ListAdapterObject> list = new ArrayList<ListAdapterObject>();
+
+		for(String s : strings){
+			list.add(new ListAdapterObject(s, s));
+		}
+
+		return new ListAdapter(list);
+	}
+
+	public static ListAdapter fromCards(List<Card> map){
+		ArrayList<ListAdapterObject> list = new ArrayList<ListAdapterObject>();
+
+		for(Card card : map){
+			list.add(new ListAdapterObject(card.back, card.front));
+		}
+
+		return new ListAdapter(list);
 	}
 
 	@Override
@@ -27,7 +48,7 @@ public class ListAdapter extends BaseAdapter{
 	}
 
 	@Override
-	public Card getItem(int position){
+	public ListAdapterObject getItem(int position){
 		return mData.get(position);
 	}
 
@@ -36,17 +57,17 @@ public class ListAdapter extends BaseAdapter{
 		final View result;
 
 		if(convertView == null){
-			result = LayoutInflater.from(parent.getContext()).inflate(android.R.layout.two_line_list_item, parent,
+			result = LayoutInflater.from(parent.getContext()).inflate(R.layout.two_line_list_item, parent,
 					false);
 		}
 		else{
 			result = convertView;
 		}
 
-		Card element = getItem(position);
+		ListAdapterObject element = getItem(position);
 
-		((TextView)result.findViewById(android.R.id.text1)).setText(element.back);
-		((TextView)result.findViewById(android.R.id.text2)).setText(element.front);
+		((TextView) result.findViewById(R.id.text_above)).setText(element.textAbove);
+		((TextView) result.findViewById(R.id.text_below)).setText(element.textBelow);
 
 		return result;
 	}

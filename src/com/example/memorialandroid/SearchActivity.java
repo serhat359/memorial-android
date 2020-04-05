@@ -64,7 +64,7 @@ public class SearchActivity extends Activity {
 				@SuppressLint("NewApi")
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-					String frontMessage = ((TextView) view.findViewById(android.R.id.text2)).getText().toString();
+					String frontMessage = ((TextView) view.findViewById(R.id.text_below)).getText().toString();
 
 					Functions.copyStringToClipboard(SearchActivity.this, frontMessage);
 					Toast.makeText(SearchActivity.this, "Text copied", Toast.LENGTH_SHORT).show();
@@ -76,7 +76,7 @@ public class SearchActivity extends Activity {
 
 			ArrayList<Card> cards = getDB().getSearchResult(s, isWholeWord);
 
-			ListAdapter adapter = new ListAdapter(cards);
+			ListAdapter adapter = ListAdapter.fromCards(cards);
 
 			listView.setAdapter(adapter);
 			registerForContextMenu(listView);

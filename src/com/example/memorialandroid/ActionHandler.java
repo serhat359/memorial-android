@@ -9,7 +9,7 @@ import java.nio.charset.Charset;
 
 import android.content.res.AssetManager;
 
-public class ActionHandler{
+public class ActionHandler {
 
 	private static final String wordDefaultSeperator = " – ";
 
@@ -18,11 +18,11 @@ public class ActionHandler{
 
 		String seperator = wordDefaultSeperator;
 
-		InputStream fis = assetManager.open("kanji.txt");
+		InputStream fis = assetManager.open(db.getAssetName() + ".txt");
 		BufferedReader br = new BufferedReader(new InputStreamReader(fis, Charset.forName("UTF-8")));
 
 		db.updateEntries(br, activity, seperator);
-		
+
 		br.close();
 		return true;
 	}

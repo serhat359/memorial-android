@@ -15,5 +15,7 @@
     <string name="export">Export</string>
     <string name="importFromFile">Import</string>
     <string name="wholeWord">Whole Word</string>
+    <string name="profile">Profile</string>
+    <string name="newProfile">New Profile</string>
     
 </resources>

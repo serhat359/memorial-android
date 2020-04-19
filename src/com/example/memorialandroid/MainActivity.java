@@ -371,10 +371,10 @@ public class MainActivity extends FragmentActivity implements Debugable {
 		try{
 			out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePath.getAbsolutePath()), "UTF-8"));
 
+			Locale locale = Locale.getDefault();
+			
 			for(Card card : allCards){
-				String formatted = String.format(Locale.getDefault(),
-						"INSERT INTO `CARDS`(`FRONT`,`BACK`,`REMAINING`) VALUES ('%s','%s',%d);\n", card.front,
-						card.back, card.remaining);
+				String formatted = db.getInsertQuery(card, locale);
 
 				out.write(formatted);
 			}

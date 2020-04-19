@@ -46,6 +46,7 @@ public class Functions{
 	 */
 	public static String getPath(final Context context, final Uri uri){
 		final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+		final boolean isOreo = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
 
 		// DocumentProvider
 		if(isKitKat && DocumentsContract.isDocumentUri(context, uri)){
@@ -68,12 +69,17 @@ public class Functions{
 			}
 			// DownloadsProvider
 			else if(isDownloadsDocument(uri)){
+				if(!isOreo){
+					final String id = DocumentsContract.getDocumentId(uri);
+					final Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"),
+							Long.valueOf(id));
 
-				final String id = DocumentsContract.getDocumentId(uri);
-				final Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"),
-						Long.valueOf(id));
-
-				return getDataColumn(context, contentUri, null, null);
+					return getDataColumn(context, contentUri, null, null);
+				}
+				else {
+					final String id = DocumentsContract.getDocumentId(uri);
+					return id.replaceFirst("raw:", "");
+				}
 			}
 			// MediaProvider
 			else if(isMediaDocument(uri)){

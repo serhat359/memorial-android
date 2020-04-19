@@ -267,6 +267,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		resetProfile(db, profileQuery, new String[] { profile });
 	}
 
+	public String getInsertQuery(Card card, Locale locale) {
+		String tableName = getTableName();
+		String formatted = String.format(locale,
+				"INSERT INTO `%s`(`FRONT`,`BACK`,`REMAINING`) VALUES ('%s','%s',%d);\n", tableName, card.front,
+				card.back, card.remaining);
+		
+		return formatted;
+	}
+	
 	public String getAssetName(){
 		return this.currentAssetName;
 	}

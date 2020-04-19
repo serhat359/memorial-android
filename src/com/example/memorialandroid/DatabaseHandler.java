@@ -147,7 +147,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		else{
 			String oldBack = rs.getString(rs.getColumnIndex(COL_BACK));
 
-			if(!oldBack.equalsIgnoreCase(tokens[1])){
+			if(!oldBack.equals(tokens[1])){
 				db.execSQL("update " + getTableName() + " set back = '" + tokens[1] + "' where front = '" + tokens[0]
 						+ "'");
 			}

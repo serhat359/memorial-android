@@ -93,8 +93,8 @@ public class MainActivity extends FragmentActivity implements Debugable {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item){
 		switch (item.getItemId()) {
-		case R.id.action_settings:
-			return true;
+		// case R.id.action_settings:
+		// return true;
 
 		case R.id.update:
 			try{
@@ -343,18 +343,18 @@ public class MainActivity extends FragmentActivity implements Debugable {
 	}
 
 	private void importDBFromFile(String filePath) throws IOException{
-		debug("Importing records");
-		boolean isSuccessful = db.importRecords(filePath, this);
-		numrows = db.getCount();
-		debug("New count is: " + numrows);
+			debug("Importing records");
+			boolean isSuccessful = db.importRecords(filePath, this);
+			numrows = db.getCount();
+			debug("New count is: " + numrows);
 
-		if(isSuccessful)
-			Toast.makeText(this, "Successfully imported", Toast.LENGTH_SHORT).show();
-		else
-			Toast.makeText(this, "Import failed", Toast.LENGTH_SHORT).show();
+			if(isSuccessful)
+				Toast.makeText(this, "Successfully imported", Toast.LENGTH_SHORT).show();
+			else
+				Toast.makeText(this, "Import failed", Toast.LENGTH_SHORT).show();
 
-		start();
-	}
+			start();
+		}
 
 	private void exportDBToFolder(String directory) throws IOException{
 		Date todaysDate = Calendar.getInstance().getTime();

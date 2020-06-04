@@ -21,10 +21,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String COL_FRONT = "FRONT";
 	private static final String COL_BACK = "BACK";
 
-	private Cursor questionCursor;
 	private String currentTableName = TABLE_CARDS;
 	private String currentAssetName = "kanji";
 
+	private String cursorFront;
+	private String cursorBack;
+	
 	public DatabaseHandler(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 	}
@@ -66,7 +68,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 	public String getQuestion(int numrows){
 		SQLiteDatabase db = this.getWritableDatabase();
-
+		Cursor questionCursor;
+		
 		while (true){
 			int n = (int) (Math.random() * numrows);
 
@@ -80,11 +83,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					+ questionCursor.getString(questionCursor.getColumnIndex(COL_FRONT)) + "'");
 		}
 
-		return questionCursor.getString(questionCursor.getColumnIndex(COL_FRONT));
+		this.cursorFront = questionCursor.getString(questionCursor.getColumnIndex(COL_FRONT));
+		this.cursorBack = questionCursor.getString(questionCursor.getColumnIndex(COL_BACK));
+		
+		questionCursor.close();
+		
+		return cursorFront;
 	}
 
 	public String getAnswer(){
-		return questionCursor.getString(questionCursor.getColumnIndex(COL_BACK));
+		return this.cursorBack;
 	}
 
 	public void setDegree(int degree, Debugable method){
@@ -92,7 +100,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		try{
 			db.execSQL("update " + getTableName() + " set remaining='" + degree + "' where front='"
-					+ questionCursor.getString(questionCursor.getColumnIndex(COL_FRONT)) + "'");
+					+ this.cursorFront + "'");
 		}
 		catch (Exception e){
 			method.debug(e.getMessage());

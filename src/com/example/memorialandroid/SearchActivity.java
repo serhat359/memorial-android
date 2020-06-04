@@ -12,6 +12,8 @@ import android.widget.*;
 
 public class SearchActivity extends Activity {
 
+	private final long delayMillis = 300L;
+	
 	CheckBox wholeWordCheckBox;
 	EditText searchEditText;
 
@@ -33,7 +35,7 @@ public class SearchActivity extends Activity {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked){
 				composingHandler.removeCallbacks(composingRunnable);
-				composingHandler.postDelayed(composingRunnable, 500);
+				composingHandler.postDelayed(composingRunnable, delayMillis);
 			}
 		});
 
@@ -42,7 +44,7 @@ public class SearchActivity extends Activity {
 			@Override
 			public void afterTextChanged(final Editable s){
 				composingHandler.removeCallbacks(composingRunnable);
-				composingHandler.postDelayed(composingRunnable, 500);
+				composingHandler.postDelayed(composingRunnable, delayMillis);
 			}
 
 			@Override

@@ -14,6 +14,7 @@
     <string name="search">Search</string>
     <string name="export">Export</string>
     <string name="importFromFile">Import</string>
+    <string name="updateFromFile">Update From File</string>
     <string name="wholeWord">Whole Word</string>
     <string name="profile">Profile</string>
     <string name="newProfile">New Profile</string>

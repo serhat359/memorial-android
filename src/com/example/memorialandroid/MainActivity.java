@@ -46,6 +46,7 @@ public class MainActivity extends FragmentActivity implements Debugable {
 
 	private static final int FILE_SELECT_FOR_EXPORT = 0;
 	private static final int FILE_SELECT_FOR_IMPORT = 1;
+	private static final int FILE_SELECT_FOR_UPDATE = 2;
 
 	private static final int PERMISSION_REQUEST_CODE = 1;
 	private static final int SEARCH_REQUEST_CODE = 2;
@@ -96,7 +97,8 @@ public class MainActivity extends FragmentActivity implements Debugable {
 		// case R.id.action_settings:
 		// return true;
 
-		case R.id.update:
+		// Update disabled after implementing updateFromFile
+		/*case R.id.update:
 			try{
 				ActionHandler.runUpdate(getAssets(), this, db);
 				Toast.makeText(this, "Update Completed", Toast.LENGTH_SHORT).show();
@@ -105,7 +107,7 @@ public class MainActivity extends FragmentActivity implements Debugable {
 			catch (Exception e){
 				debug(e);
 			}
-			return true;
+			return true;*/
 
 		case R.id.search:
 			try{
@@ -163,6 +165,20 @@ public class MainActivity extends FragmentActivity implements Debugable {
 					});
 
 			return true;
+			
+		case R.id.updateFromFile:
+			requestPermission(Manifest.permission.READ_EXTERNAL_STORAGE, new Runnable() {
+				@Override
+				public void run(){
+					try{
+						showFileChooser(FILE_SELECT_FOR_UPDATE, "text/plain");
+					}
+					catch (Exception e){
+						debug(e);
+					}
+				}
+
+			});
 
 		default:
 			return super.onOptionsItemSelected(item);
@@ -200,6 +216,24 @@ public class MainActivity extends FragmentActivity implements Debugable {
 					importDBFromFile(path);
 				}
 				catch (IOException e){
+					debug(e.getMessage());
+				}
+			}
+			break;
+		case FILE_SELECT_FOR_UPDATE:
+			if(resultCode == RESULT_OK){
+				// Get the path of the chosen file
+				String path = Functions.getPath(this, data.getData());
+
+				if(path == null)
+					debug("Error: Path is null");
+				
+				try{
+					ActionHandler.runUpdate(path, this, db);
+					Toast.makeText(this, "Update Completed", Toast.LENGTH_SHORT).show();
+					start();
+				}
+				catch (Exception e){
 					debug(e.getMessage());
 				}
 			}

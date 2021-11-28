@@ -282,7 +282,6 @@ public class MainActivity extends FragmentActivity implements Debugable {
 			buttons[i].setEnabled(b);
 	}
 
-	@SuppressWarnings("unused")
 	public void showAnswer_click(View v){
 		show.setEnabled(false);
 		buttonsEnabled(true);
